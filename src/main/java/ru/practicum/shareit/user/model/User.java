@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 public class User {
-    private Integer id;
+    private Long id;
     @NotBlank
     private String name;
     @Email

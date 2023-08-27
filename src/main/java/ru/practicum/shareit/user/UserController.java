@@ -27,7 +27,7 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    public User updateUser(@PathVariable("id") Integer id, @RequestBody UserDto user) {
+    public User updateUser(@PathVariable("id") Long id, @RequestBody UserDto user) {
         log.info("Запрос на обновление пользователя с id: {}", id);
         User updatedUser = userService.updateUser(id, user);
         log.info("Пользователь обновлён: {}", updatedUser);
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable("id") Integer id) {
+    public User getUser(@PathVariable("id") Long id) {
         log.info("Запрос на получение пользователя с id: {}", id);
         User user = userService.getUser(id);
         log.info("Пользователь получен: {}", user);
@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") Integer id) {
+    public void deleteUser(@PathVariable("id") Long id) {
         log.info("Запрос на удаление пользователя с id: {}", id);
         userService.deleteUser(id);
         log.info("Пользователь удалён");

@@ -7,9 +7,11 @@ import java.util.*;
 
 @Component
 public class ItemRepository {
-    private final Map<Integer, Item> items = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
+    private Long id = 0L;
 
     public Item addItem(Item item) {
+        item.setId(++id);
         items.put(item.getId(), item);
         return item;
     }
@@ -19,11 +21,11 @@ public class ItemRepository {
         return item;
     }
 
-    public Item getItem(Integer itemId) {
+    public Item getItem(Long itemId) {
         return items.get(itemId);
     }
 
-    public List<Item> getOwnerItems(Integer userId) {
+    public List<Item> getOwnerItems(Long userId) {
         List<Item> ownerItems = new ArrayList<>();
         for (Item item : items.values()) {
             if (Objects.equals(item.getOwner().getId(), userId)) {

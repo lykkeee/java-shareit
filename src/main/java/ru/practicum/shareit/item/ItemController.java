@@ -17,14 +17,14 @@ import java.util.List;
 @RequestMapping("/items")
 @Slf4j
 public class ItemController {
-    public ItemServiceImpl itemService;
+    public final ItemServiceImpl itemService;
 
     public ItemController(ItemServiceImpl itemService) {
         this.itemService = itemService;
     }
 
     @PostMapping
-    public Item addItem(@RequestHeader("X-Sharer-User-Id") Integer userId, @RequestBody @Valid ItemAddDto item) {
+    public Item addItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemAddDto item) {
         log.info("Запрос на добавление новой вещи: {}", item);
         Item addedItem = itemService.addItem(userId, item);
         log.info("Вещь добавлена: {}", addedItem);
@@ -32,7 +32,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public Item updateItem(@PathVariable("itemId") Integer itemId, @RequestBody @Valid ItemUpdateDto item, @RequestHeader("X-Sharer-User-Id") Integer userId) {
+    public Item updateItem(@PathVariable("itemId") Long itemId, @RequestBody @Valid ItemUpdateDto item, @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Запрос на обновление вещи: {}", item);
         Item updatedItem = itemService.updateItem(itemId, item, userId);
         log.info("Вещь обновлена: {}", updatedItem);
@@ -40,7 +40,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemGetDto getItem(@PathVariable("itemId") Integer itemId) {
+    public ItemGetDto getItem(@PathVariable("itemId") Long itemId) {
         log.info("Запрос на получение вещи с id: {}", itemId);
         ItemGetDto item = itemService.getItem(itemId);
         log.info("Вещь получена: {}", item);
@@ -48,7 +48,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemGetDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Integer userId) {
+    public List<ItemGetDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Запрос на получение всех вещей владельца с id: {}", userId);
         List<ItemGetDto> items = itemService.getOwnerItems(userId);
         log.info("Список вещей получен");
