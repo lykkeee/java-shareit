@@ -151,7 +151,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void setComments(ItemGetDto itemGetDto) {
         List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
-        for (Comment comment : commentRepository.findByItem_Id(itemGetDto.getId())) {
+        for (Comment comment : commentRepository.findByItemId(itemGetDto.getId())) {
             String authorName = comment.getAuthor().getName();
             CommentResponseDto commentResponseDto = mapper.map(comment, CommentResponseDto.class);
             commentResponseDto.setAuthorName(authorName);
