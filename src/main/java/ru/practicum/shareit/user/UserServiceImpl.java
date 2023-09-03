@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -20,11 +21,12 @@ public class UserServiceImpl implements UserService {
     }
 
     public User createUser(User user) {
-        return userRepository.createUser(user);
+        return userRepository.save(user);
     }
 
     public User updateUser(Long id, UserDto userDto) {
-        User user = userRepository.getUser(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с данным id не найден: " + id));
         if (userDto.getEmail() == null) {
             userDto.setEmail(user.getEmail());
         }
@@ -33,18 +35,19 @@ public class UserServiceImpl implements UserService {
         }
         userDto.setId(id);
         user = mapper.map(userDto, User.class);
-        return userRepository.updateUser(user);
+        return userRepository.save(user);
     }
 
     public User getUser(Long id) {
-        return userRepository.getUser(id);
+        return userRepository.findById(id)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с данным id не найден: " + id));
     }
 
     public List<User> getUsers() {
-        return userRepository.getUsers();
+        return userRepository.findAll();
     }
 
     public void deleteUser(Long id) {
-        userRepository.deleteUser(id);
+        userRepository.deleteById(id);
     }
 }

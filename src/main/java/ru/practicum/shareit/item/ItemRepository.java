@@ -1,55 +1,20 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.List;
 
-@Component
-public class ItemRepository {
-    private final Map<Long, Item> items = new HashMap<>();
-    private Long id = 0L;
+@Repository
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    public Item addItem(Item item) {
-        item.setId(++id);
-        items.put(item.getId(), item);
-        return item;
-    }
+    List<Item> findByOwnerId(Long ownerId);
 
-    public Item updateItem(Item item) {
-        items.put(item.getId(), item);
-        return item;
-    }
-
-    public Item getItem(Long itemId) {
-        return items.get(itemId);
-    }
-
-    public List<Item> getOwnerItems(Long userId) {
-        List<Item> ownerItems = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (Objects.equals(item.getOwner().getId(), userId)) {
-                ownerItems.add(item);
-            }
-        }
-        return ownerItems;
-    }
-
-    public List<Item> getSearchedItems(String text) {
-        List<Item> searchedItems = new ArrayList<>();
-        if (text.isBlank()) {
-            return searchedItems;
-        }
-        for (Item item : items.values()) {
-            if (item.getAvailable() && (item.getName().toLowerCase().contains(text) || item.getDescription().toLowerCase().contains(text))) {
-                searchedItems.add(item);
-            }
-        }
-        return searchedItems;
-    }
-
-    public List<Item> getItems() {
-        return new ArrayList<>(items.values());
-    }
+    @Query(" select i from Item i " +
+            "where i.available = true and (upper(i.name) like upper(concat('%', ?1, '%')) " +
+            " or upper(i.description) like upper(concat('%', ?1, '%')))")
+    List<Item> search(String text);
 
 }
