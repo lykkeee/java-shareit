@@ -7,7 +7,7 @@ import ru.practicum.shareit.comment.dto.CommentResponseDto;
 import java.util.List;
 
 @Data
-public class ItemGetDto {
+public class ItemResponseDto {
     Long id;
     String name;
     String description;

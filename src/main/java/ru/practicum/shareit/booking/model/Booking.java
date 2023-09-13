@@ -1,22 +1,24 @@
-package ru.practicum.shareit.comment;
+package ru.practicum.shareit.booking.model;
 
 import lombok.Data;
+import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "bookings")
 @Data
-public class Comment {
+public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    private String text;
+    @Column(name = "start_date")
+    private LocalDateTime start;
+    @Column(name = "end_date")
+    private LocalDateTime end;
     @ManyToOne(
             cascade = CascadeType.ALL
     )
@@ -29,10 +31,10 @@ public class Comment {
             cascade = CascadeType.ALL
     )
     @JoinColumn(
-            name = "author_id",
+            name = "booker_id",
             referencedColumnName = "id"
     )
-    private User author;
-    private LocalDateTime created;
-
+    private User booker;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }

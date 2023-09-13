@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -42,17 +43,17 @@ public class BookingController {
     }
 
     @GetMapping()
-    public List<Booking> getUserBookings(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "ALL") String state) {
+    public List<BookingResponseDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "ALL") String state) {
         log.info("Запрос на получение списка бронирований для пользователя с id: {}", userId);
-        List<Booking> bookings = bookingService.getUserBookings(userId, state);
+        List<BookingResponseDto> bookings = bookingService.getUserBookings(userId, state);
         log.info("Список бронирований получен");
         return bookings;
     }
 
     @GetMapping("/owner")
-    public List<Booking> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "ALL") String state) {
+    public List<BookingResponseDto> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "ALL") String state) {
         log.info("Запрос на получение списка бронирований для владельца с id: {}", userId);
-        List<Booking> bookings = bookingService.getOwnerBookings(userId, state);
+        List<BookingResponseDto> bookings = bookingService.getOwnerBookings(userId, state);
         log.info("Список бронирований получен");
         return bookings;
     }

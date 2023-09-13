@@ -1,22 +1,29 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.enums.State;
+import ru.practicum.shareit.booking.enums.Status;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.exception.IllegalStateException;
 import ru.practicum.shareit.exception.IncorrectTimeException;
 import ru.practicum.shareit.exception.OwnersBookingException;
 import ru.practicum.shareit.exception.UnavailableStatusException;
-import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -37,11 +44,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IncorrectTimeException("Недопустимое время бронирование");
         }
         if (item.getAvailable()) {
-            Booking booking = mapper.map(bookingRequestDto, Booking.class);
-            booking.setId(null);
-            booking.setBooker(user);
-            booking.setItem(item);
-            booking.setStatus(Status.WAITING);
+            Booking booking = BookingMapper.requestToBookingModel(bookingRequestDto, item, user, Status.WAITING);
             return mapper.map(bookingRepository.save(booking), BookingResponseDto.class);
         } else {
             throw new UnavailableStatusException("Вещь недоступна для брони");
@@ -75,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getUserBookings(Long userId, String state) {
+    public List<BookingResponseDto> getUserBookings(Long userId, String state) {
         State enumState;
         try {
             enumState = State.valueOf(state);
@@ -83,26 +86,32 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Unknown state: UNSUPPORTED_STATUS");
         }
         getUser(userId);
+        List<Booking> response = new ArrayList<>();
         switch (enumState) {
             case ALL:
-                return bookingRepository.findByBooker_IdOrderByStartDesc(userId);
+                response = bookingRepository.findByBooker_IdOrderByStartDesc(userId);
+                break;
             case CURRENT:
-                return bookingRepository.findByBookerIdCurrent(userId);
+                response = bookingRepository.findByBookerIdCurrent(userId);
+                break;
             case PAST:
-                return bookingRepository.findByBookerIdAndEndIsBefore(userId);
+                response = bookingRepository.findByBookerIdAndEndIsBefore(userId);
+                break;
             case FUTURE:
-                return bookingRepository.findByBookerIdAndStartIsAfter(userId);
+                response = bookingRepository.findByBookerIdAndStartIsAfter(userId);
+                break;
             case WAITING:
-                return bookingRepository.findByBookerIdAndStatus(userId, "WAITING");
+                response = bookingRepository.findByBookerIdAndStatus(userId, "WAITING");
+                break;
             case REJECTED:
-                return bookingRepository.findByBookerIdAndStatus(userId, "REJECTED");
-            default:
-                throw new RuntimeException();
+                response = bookingRepository.findByBookerIdAndStatus(userId, "REJECTED");
+                break;
         }
+        return response.stream().map(booking -> mapper.map(booking, BookingResponseDto.class)).collect(Collectors.toList());
     }
 
     @Override
-    public List<Booking> getOwnerBookings(Long userId, String state) {
+    public List<BookingResponseDto> getOwnerBookings(Long userId, String state) {
         State enumState;
         try {
             enumState = State.valueOf(state);
@@ -113,22 +122,28 @@ public class BookingServiceImpl implements BookingService {
         if (itemRepository.findByOwnerId(userId).isEmpty()) {
             throw new OwnersBookingException("Пользователь не является владельцем ни одной вещи");
         }
+        List<Booking> response = new ArrayList<>();
         switch (enumState) {
             case ALL:
-                return bookingRepository.findByOwnerId(userId);
+                response = bookingRepository.findByOwnerId(userId);
+                break;
             case CURRENT:
-                return bookingRepository.findByOwnerIdCurrent(userId);
+                response = bookingRepository.findByOwnerIdCurrent(userId);
+                break;
             case PAST:
-                return bookingRepository.findByOwnerIdPast(userId);
+                response = bookingRepository.findByOwnerIdPast(userId);
+                break;
             case FUTURE:
-                return bookingRepository.findByOwnerIdFuture(userId);
+                response = bookingRepository.findByOwnerIdFuture(userId);
+                break;
             case WAITING:
-                return bookingRepository.findByOwnerIdStatus(userId, Status.WAITING);
+                response = bookingRepository.findByOwnerIdStatus(userId, Status.WAITING);
+                break;
             case REJECTED:
-                return bookingRepository.findByOwnerIdStatus(userId, Status.REJECTED);
-            default:
-                throw new RuntimeException();
+                response = bookingRepository.findByOwnerIdStatus(userId, Status.REJECTED);
+                break;
         }
+        return response.stream().map(booking -> mapper.map(booking, BookingResponseDto.class)).collect(Collectors.toList());
     }
 
     private User getUser(Long userId) {

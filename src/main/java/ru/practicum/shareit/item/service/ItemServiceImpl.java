@@ -1,25 +1,26 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingItemDto;
-import ru.practicum.shareit.comment.Comment;
-import ru.practicum.shareit.comment.CommentRepository;
+import ru.practicum.shareit.comment.mapper.CommentMapper;
+import ru.practicum.shareit.comment.model.Comment;
+import ru.practicum.shareit.comment.repository.CommentRepository;
 import ru.practicum.shareit.comment.dto.CommentRequestDto;
 import ru.practicum.shareit.comment.dto.CommentResponseDto;
 import ru.practicum.shareit.exception.DataNotFoundException;
 import ru.practicum.shareit.exception.IncorrectUserCommentException;
-import ru.practicum.shareit.item.dto.ItemAddDto;
-import ru.practicum.shareit.item.dto.ItemGetDto;
+import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -35,16 +36,17 @@ public class ItemServiceImpl implements ItemService {
     private final ModelMapper mapper;
 
     @Override
-    public Item addItem(Long userId, ItemAddDto itemAddDto) {
+    public ItemResponseDto addItem(Long userId, ItemRequestDto itemRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с данным id не найден: " + userId));
-        Item item = mapper.map(itemAddDto, Item.class);
+        Item item = mapper.map(itemRequestDto, Item.class);
         item.setOwner(user);
-        return itemRepository.save(item);
+        Item addedItem = itemRepository.save(item);
+        return mapper.map(addedItem, ItemResponseDto.class);
     }
 
     @Override
-    public Item updateItem(Long itemId, ItemUpdateDto itemUpdateDto, Long userId) {
+    public ItemResponseDto updateItem(Long itemId, ItemUpdateDto itemUpdateDto, Long userId) {
         User user = getUser(userId);
         Item item = getItemExists(itemId);
         if (!Objects.equals(item.getOwner().getId(), userId)) {
@@ -62,46 +64,47 @@ public class ItemServiceImpl implements ItemService {
         item = mapper.map(itemUpdateDto, Item.class);
         item.setId(itemId);
         item.setOwner(user);
-        return itemRepository.save(item);
+        Item updatedItem = itemRepository.save(item);
+        return mapper.map(updatedItem, ItemResponseDto.class);
     }
 
     @Override
-    public ItemGetDto getItem(Long itemId, Long userId) {
+    public ItemResponseDto getItem(Long itemId, Long userId) {
         Item item = getItemExists(itemId);
-        ItemGetDto itemGetDto = mapper.map(item, ItemGetDto.class);
+        ItemResponseDto itemResponseDto = mapper.map(item, ItemResponseDto.class);
         if (Objects.equals(item.getOwner().getId(), userId)) {
-            setBooking(itemGetDto);
+            setBooking(itemResponseDto);
         } else {
-            itemGetDto.setLastBooking(null);
-            itemGetDto.setNextBooking(null);
+            itemResponseDto.setLastBooking(null);
+            itemResponseDto.setNextBooking(null);
         }
-        setComments(itemGetDto);
-        return itemGetDto;
+        setComments(itemResponseDto);
+        return itemResponseDto;
     }
 
     @Override
-    public List<ItemGetDto> getOwnerItems(Long userId) {
-        List<ItemGetDto> itemGetDtos = new ArrayList<>();
+    public List<ItemResponseDto> getOwnerItems(Long userId) {
+        List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
         for (Item item : itemRepository.findByOwnerId(userId)) {
-            ItemGetDto itemGetDto = mapper.map(item, ItemGetDto.class);
-            setBooking(itemGetDto);
-            setComments(itemGetDto);
-            itemGetDtos.add(itemGetDto);
+            ItemResponseDto itemResponseDto = mapper.map(item, ItemResponseDto.class);
+            setBooking(itemResponseDto);
+            setComments(itemResponseDto);
+            itemResponseDtos.add(itemResponseDto);
         }
-        return itemGetDtos;
+        return itemResponseDtos;
     }
 
     @Override
-    public List<ItemGetDto> getSearchedItems(String text) {
-        List<ItemGetDto> itemGetDtos = new ArrayList<>();
+    public List<ItemResponseDto> getSearchedItems(String text) {
+        List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
         if (!text.isBlank()) {
             for (Item item : itemRepository.search(text)) {
-                ItemGetDto itemGetDto = mapper.map(item, ItemGetDto.class);
-                setBooking(itemGetDto);
-                itemGetDtos.add(itemGetDto);
+                ItemResponseDto itemResponseDto = mapper.map(item, ItemResponseDto.class);
+                setBooking(itemResponseDto);
+                itemResponseDtos.add(itemResponseDto);
             }
         }
-        return itemGetDtos;
+        return itemResponseDtos;
     }
 
     @Override
@@ -111,10 +114,7 @@ public class ItemServiceImpl implements ItemService {
         if (bookingRepository.findBookingForComment(userId, itemId).isEmpty()) {
             throw new IncorrectUserCommentException("У пользователя нет завершенных бронирований для этого предмета");
         }
-        Comment comment = mapper.map(text, Comment.class);
-        comment.setAuthor(user);
-        comment.setItem(item);
-        comment.setCreated(LocalDateTime.now());
+        Comment comment = CommentMapper.requestToCommentModel(text, user, item);
         CommentResponseDto commentResponseDto = mapper.map(commentRepository.save(comment), CommentResponseDto.class);
         commentResponseDto.setAuthorName(user.getName());
         return commentResponseDto;
@@ -130,33 +130,33 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new DataNotFoundException("Вещь с данным id не найдена: " + itemId));
     }
 
-    private void setBooking(ItemGetDto itemGetDto) {
-        List<Booking> lastBookings = bookingRepository.findLastBooking(itemGetDto.getId());
-        List<Booking> nextBookings = bookingRepository.findNextBooking(itemGetDto.getId());
+    private void setBooking(ItemResponseDto itemResponseDto) {
+        List<Booking> lastBookings = bookingRepository.findLastBooking(itemResponseDto.getId());
+        List<Booking> nextBookings = bookingRepository.findNextBooking(itemResponseDto.getId());
         if (lastBookings.isEmpty()) {
-            itemGetDto.setLastBooking(null);
+            itemResponseDto.setLastBooking(null);
         } else {
             BookingItemDto bookingItemDto = mapper.map(lastBookings.get(0), BookingItemDto.class);
             bookingItemDto.setBookerId(lastBookings.get(0).getBooker().getId());
-            itemGetDto.setLastBooking(bookingItemDto);
+            itemResponseDto.setLastBooking(bookingItemDto);
         }
         if (nextBookings.isEmpty()) {
-            itemGetDto.setNextBooking(null);
+            itemResponseDto.setNextBooking(null);
         } else {
             BookingItemDto bookingItemDto = mapper.map(nextBookings.get(0), BookingItemDto.class);
             bookingItemDto.setBookerId(nextBookings.get(0).getBooker().getId());
-            itemGetDto.setNextBooking(bookingItemDto);
+            itemResponseDto.setNextBooking(bookingItemDto);
         }
     }
 
-    private void setComments(ItemGetDto itemGetDto) {
+    private void setComments(ItemResponseDto itemResponseDto) {
         List<CommentResponseDto> commentResponseDtos = new ArrayList<>();
-        for (Comment comment : commentRepository.findByItemId(itemGetDto.getId())) {
+        for (Comment comment : commentRepository.findByItemId(itemResponseDto.getId())) {
             String authorName = comment.getAuthor().getName();
             CommentResponseDto commentResponseDto = mapper.map(comment, CommentResponseDto.class);
             commentResponseDto.setAuthorName(authorName);
             commentResponseDtos.add(commentResponseDto);
         }
-        itemGetDto.setComments(commentResponseDtos);
+        itemResponseDto.setComments(commentResponseDtos);
     }
 }
