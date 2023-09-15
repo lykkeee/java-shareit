@@ -1,9 +1,12 @@
 package ru.practicum.shareit.user;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
+import ru.practicum.shareit.user.dto.UserRequestDto;
+import ru.practicum.shareit.user.dto.UserResponseDto;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -11,41 +14,38 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 @Slf4j
+@AllArgsConstructor
 public class UserController {
     private final UserServiceImpl userService;
 
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
-    }
-
     @PostMapping
-    public User createUser(@RequestBody @Valid User user) {
+    public UserResponseDto createUser(@RequestBody @Valid UserRequestDto user) {
         log.info("Запрос на создание пользователя: {}", user);
-        User createdUser = userService.createUser(user);
+        UserResponseDto createdUser = userService.createUser(user);
         log.info("Пользователь создан: {}", createdUser);
         return createdUser;
     }
 
     @PatchMapping("/{id}")
-    public User updateUser(@PathVariable("id") Long id, @RequestBody UserDto user) {
+    public UserResponseDto updateUser(@PathVariable("id") Long id, @RequestBody UserUpdateDto user) {
         log.info("Запрос на обновление пользователя с id: {}", id);
-        User updatedUser = userService.updateUser(id, user);
+        UserResponseDto updatedUser = userService.updateUser(id, user);
         log.info("Пользователь обновлён: {}", updatedUser);
         return updatedUser;
     }
 
     @GetMapping("/{id}")
-    public User getUser(@PathVariable("id") Long id) {
+    public UserResponseDto getUser(@PathVariable("id") Long id) {
         log.info("Запрос на получение пользователя с id: {}", id);
-        User user = userService.getUser(id);
+        UserResponseDto user = userService.getUser(id);
         log.info("Пользователь получен: {}", user);
         return user;
     }
 
     @GetMapping
-    public List<User> getUsers() {
+    public List<UserResponseDto> getUsers() {
         log.info("Запрос на получение всех пользователей");
-        List<User> users = userService.getUsers();
+        List<UserResponseDto> users = userService.getUsers();
         log.info("Пользователи получены");
         return users;
     }

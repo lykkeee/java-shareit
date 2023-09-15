@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.repository;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.*;
 
 @Component
-public class ItemRepository {
+public class InMemoryItemRepository {
     private final Map<Long, Item> items = new HashMap<>();
     private Long id = 0L;
 
@@ -37,7 +37,7 @@ public class ItemRepository {
 
     public List<Item> getSearchedItems(String text) {
         List<Item> searchedItems = new ArrayList<>();
-        if (text.isBlank()) {
+        if (text == null || (text.isBlank())) {
             return searchedItems;
         }
         for (Item item : items.values()) {
