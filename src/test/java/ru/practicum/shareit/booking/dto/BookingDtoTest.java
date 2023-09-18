@@ -20,7 +20,7 @@ class BookingDtoTest {
 
     @Test
     @SneakyThrows
-    void BookingRequestDtoTest() {
+    void bookingRequestDtoTest() {
         BookingRequestDto bookingRequestDto = new BookingRequestDto();
         bookingRequestDto.setStart(LocalDateTime.now());
         bookingRequestDto.setEnd(LocalDateTime.now().plusDays(1));

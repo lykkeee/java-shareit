@@ -17,7 +17,7 @@ class CommentDtoTest {
 
     @Test
     @SneakyThrows
-    void CommentRequestDtoTest() {
+    void commentRequestDtoTest() {
         CommentRequestDto commentRequestDto = new CommentRequestDto();
         commentRequestDto.setText("text");
 

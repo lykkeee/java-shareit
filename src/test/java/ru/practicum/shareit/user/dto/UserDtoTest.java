@@ -17,7 +17,7 @@ class UserDtoTest {
 
     @Test
     @SneakyThrows
-    void UserRequestDtoTest() {
+    void userRequestDtoTest() {
         UserRequestDto userRequestDto = new UserRequestDto();
         userRequestDto.setName("name");
         userRequestDto.setEmail("q@e.com");

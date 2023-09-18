@@ -17,7 +17,7 @@ class ItemDtoTest {
 
     @Test
     @SneakyThrows
-    void ItemRequestDtoTest() {
+    void itemRequestDtoTest() {
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         itemRequestDto.setName("name");
         itemRequestDto.setDescription("desc");
