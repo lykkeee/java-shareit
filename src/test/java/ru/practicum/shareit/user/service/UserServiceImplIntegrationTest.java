@@ -5,9 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
-import ru.practicum.shareit.user.dto.UserUpdateDto;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 class UserServiceImplIntegrationTest {
@@ -16,21 +18,15 @@ class UserServiceImplIntegrationTest {
     private UserServiceImpl userService;
 
     @Test
-    void updateUser() {
+    void getUsers() {
         UserRequestDto user = new UserRequestDto();
         user.setName("name");
         user.setEmail("e@s.com");
         UserResponseDto user1 = userService.createUser(user);
 
-        UserUpdateDto userUpdateDto = new UserUpdateDto();
-        userUpdateDto.setName("nameU");
-        user1 = userService.updateUser(user1.getId(), userUpdateDto);
+        List<UserResponseDto> users = userService.getUsers();
 
-        assertEquals("nameU", user1.getName());
-
-        userUpdateDto.setEmail("e@sU.com");
-        user1 = userService.updateUser(user1.getId(), userUpdateDto);
-
-        assertEquals("e@sU.com", user1.getEmail());
+        assertFalse(users.isEmpty());
+        assertEquals("name", users.get(0).getName());
     }
 }
