@@ -13,6 +13,8 @@ import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,6 +59,7 @@ class UserServiceImplTest {
     void updateUser() {
         UserUpdateDto request = new UserUpdateDto();
         request.setName("nameU");
+        request.setEmail("d@f.ru");
 
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user));
         when(userRepository.save(any(User.class))).thenReturn(user);
@@ -75,5 +78,20 @@ class UserServiceImplTest {
         assertEquals(1L, userResponseDto.getId());
         assertEquals("name", userResponseDto.getName());
         assertEquals("w@l.com", userResponseDto.getEmail());
+    }
+
+    @Test
+    void getUsers() {
+        when(userRepository.findAll()).thenReturn(Collections.singletonList(user));
+
+        List<UserResponseDto> users = userService.getUsers();
+
+        assertFalse(users.isEmpty());
+        assertEquals("name", users.get(0).getName());
+    }
+
+    @Test
+    void deleteUser() {
+        userService.deleteUser(user.getId());
     }
 }

@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestItemDto;
@@ -18,6 +20,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +95,18 @@ class ItemRequestServiceImplTest {
         assertFalse(response.isEmpty());
         assertEquals("desc", response.get(0).getDescription());
 
+    }
+
+    @Test
+    void getAllRequests() {
+        when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user));
+        when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item));
+        when(itemRequestRepository.findByNotInRequestorId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(itemRequest)));
+
+        List<ItemRequestItemDto> response = itemRequestService.getAllRequests(user.getId(), 0, 10);
+
+        assertFalse(response.isEmpty());
+        assertEquals("desc", response.get(0).getDescription());
     }
 
     @Test

@@ -20,7 +20,7 @@ public class Item {
     @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "request_id", referencedColumnName = "id")
     private ItemRequest request;
 

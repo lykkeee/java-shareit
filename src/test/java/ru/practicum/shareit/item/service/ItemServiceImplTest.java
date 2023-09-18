@@ -13,11 +13,14 @@ import ru.practicum.shareit.comment.dto.CommentRequestDto;
 import ru.practicum.shareit.comment.dto.CommentResponseDto;
 import ru.practicum.shareit.comment.model.Comment;
 import ru.practicum.shareit.comment.repository.CommentRepository;
+import ru.practicum.shareit.exception.DataNotFoundException;
+import ru.practicum.shareit.exception.IncorrectUserCommentException;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -81,8 +84,10 @@ class ItemServiceImplTest {
         request.setName("item");
         request.setDescription("desc");
         request.setAvailable(true);
+        request.setRequestId(1L);
 
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user));
+        when(itemRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new ItemRequest()));
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
         ItemResponseDto response = itemService.addItem(owner.getId(), request);
@@ -93,13 +98,29 @@ class ItemServiceImplTest {
     @Test
     void updateItem() {
         ItemUpdateDto request = new ItemUpdateDto();
-        request.setName("itemU");
+        request.setRequestId(1L);
 
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item));
+        when(itemRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new ItemRequest()));
         when(itemRepository.save(any(Item.class))).thenReturn(item);
 
+        assertThrows(DataNotFoundException.class, () -> {
+            ItemResponseDto response = itemService.updateItem(item.getId(), request, user.getId());
+        });
+
         ItemResponseDto response = itemService.updateItem(item.getId(), request, owner.getId());
+
+        assertEquals("item", response.getName());
+    }
+
+    @Test
+    void getItem() {
+        when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item));
+
+        ItemResponseDto response = itemService.getItem(item.getId(), owner.getId());
+
+        response = itemService.getItem(item.getId(), user.getId());
 
         assertEquals("item", response.getName());
     }
@@ -115,6 +136,11 @@ class ItemServiceImplTest {
 
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item));
+        when(bookingRepository.findBookingForComment(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Collections.emptyList());
+        assertThrows(IncorrectUserCommentException.class, () -> {
+            CommentResponseDto response = itemService.addComment(user.getId(), item.getId(), request);
+        });
+
         when(bookingRepository.findBookingForComment(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Collections.singletonList(booking));
         when(commentRepository.save(any(Comment.class))).thenReturn(comment);
 

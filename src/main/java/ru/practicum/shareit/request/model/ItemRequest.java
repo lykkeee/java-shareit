@@ -14,7 +14,7 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "requestor_id", referencedColumnName = "id")
     private User requestor;
     private LocalDateTime created;
