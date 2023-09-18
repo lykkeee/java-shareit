@@ -8,11 +8,12 @@ import java.util.List;
 
 @Data
 public class ItemResponseDto {
-    Long id;
-    String name;
-    String description;
-    Boolean available;
-    BookingItemDto lastBooking;
-    BookingItemDto nextBooking;
-    List<CommentResponseDto> comments;
+    private Long id;
+    private String name;
+    private String description;
+    private Boolean available;
+    private BookingItemDto lastBooking;
+    private BookingItemDto nextBooking;
+    private List<CommentResponseDto> comments;
+    private Long requestId;
 }

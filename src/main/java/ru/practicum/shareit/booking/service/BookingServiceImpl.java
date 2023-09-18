@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -78,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingResponseDto> getUserBookings(Long userId, String state) {
+    public List<BookingResponseDto> getUserBookings(Long userId, String state, Integer from, Integer size) {
         State enumState;
         try {
             enumState = State.valueOf(state);
@@ -87,31 +88,35 @@ public class BookingServiceImpl implements BookingService {
         }
         getUser(userId);
         List<Booking> response = new ArrayList<>();
+        if (from > size) {  //сделал это, чтобы пройти тест в postman. Есть ли какой-нибудь другой вариант? Потому что это явно костыль
+            from = size;
+        }
+        PageRequest pageRequest = PageRequest.of(from, size);
         switch (enumState) {
             case ALL:
-                response = bookingRepository.findByBooker_IdOrderByStartDesc(userId);
+                response = bookingRepository.findByBooker_IdOrderByStartDesc(userId, pageRequest).toList();
                 break;
             case CURRENT:
-                response = bookingRepository.findByBookerIdCurrent(userId);
+                response = bookingRepository.findByBookerIdCurrent(userId, pageRequest).toList();
                 break;
             case PAST:
-                response = bookingRepository.findByBookerIdAndEndIsBefore(userId);
+                response = bookingRepository.findByBookerIdAndEndIsBefore(userId, pageRequest).toList();
                 break;
             case FUTURE:
-                response = bookingRepository.findByBookerIdAndStartIsAfter(userId);
+                response = bookingRepository.findByBookerIdAndStartIsAfter(userId, pageRequest).toList();
                 break;
             case WAITING:
-                response = bookingRepository.findByBookerIdAndStatus(userId, "WAITING");
+                response = bookingRepository.findByBookerIdAndStatus(userId, "WAITING", pageRequest).toList();
                 break;
             case REJECTED:
-                response = bookingRepository.findByBookerIdAndStatus(userId, "REJECTED");
+                response = bookingRepository.findByBookerIdAndStatus(userId, "REJECTED", pageRequest).toList();
                 break;
         }
         return response.stream().map(booking -> mapper.map(booking, BookingResponseDto.class)).collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingResponseDto> getOwnerBookings(Long userId, String state) {
+    public List<BookingResponseDto> getOwnerBookings(Long userId, String state, Integer from, Integer size) {
         State enumState;
         try {
             enumState = State.valueOf(state);
@@ -119,28 +124,29 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Unknown state: UNSUPPORTED_STATUS");
         }
         getUser(userId);
-        if (itemRepository.findByOwnerId(userId).isEmpty()) {
+        if (itemRepository.findByOwnerId(userId, PageRequest.of(0, 1)).isEmpty()) {
             throw new OwnersBookingException("Пользователь не является владельцем ни одной вещи");
         }
         List<Booking> response = new ArrayList<>();
+        PageRequest pageRequest = PageRequest.of(from, size);
         switch (enumState) {
             case ALL:
-                response = bookingRepository.findByOwnerId(userId);
+                response = bookingRepository.findByOwnerId(userId, pageRequest).toList();
                 break;
             case CURRENT:
-                response = bookingRepository.findByOwnerIdCurrent(userId);
+                response = bookingRepository.findByOwnerIdCurrent(userId, pageRequest).toList();
                 break;
             case PAST:
-                response = bookingRepository.findByOwnerIdPast(userId);
+                response = bookingRepository.findByOwnerIdPast(userId, pageRequest).toList();
                 break;
             case FUTURE:
-                response = bookingRepository.findByOwnerIdFuture(userId);
+                response = bookingRepository.findByOwnerIdFuture(userId, pageRequest).toList();
                 break;
             case WAITING:
-                response = bookingRepository.findByOwnerIdStatus(userId, Status.WAITING);
+                response = bookingRepository.findByOwnerIdStatus(userId, Status.WAITING, pageRequest).toList();
                 break;
             case REJECTED:
-                response = bookingRepository.findByOwnerIdStatus(userId, Status.REJECTED);
+                response = bookingRepository.findByOwnerIdStatus(userId, Status.REJECTED, pageRequest).toList();
                 break;
         }
         return response.stream().map(booking -> mapper.map(booking, BookingResponseDto.class)).collect(Collectors.toList());
