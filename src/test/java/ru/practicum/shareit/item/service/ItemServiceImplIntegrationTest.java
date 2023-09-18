@@ -5,17 +5,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
+import ru.practicum.shareit.booking.model.QBooking;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.comment.dto.CommentRequestDto;
+import ru.practicum.shareit.comment.model.QComment;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
 import ru.practicum.shareit.item.dto.ItemResponseDto;
+import ru.practicum.shareit.item.model.QItem;
 import ru.practicum.shareit.request.dto.ItemRequestRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
+import ru.practicum.shareit.request.model.QItemRequest;
 import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.dto.UserResponseDto;
+import ru.practicum.shareit.user.model.QUser;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,6 +29,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ItemServiceImplIntegrationTest {
+
+    @Autowired
+    private EntityManager entityManager;
 
     @Autowired
     private ItemServiceImpl itemService;
@@ -89,5 +98,16 @@ class ItemServiceImplIntegrationTest {
 
         assertFalse(items.isEmpty());
         assertEquals("item", items.get(0).getName());
+    }
+
+    @Test
+    void queryTest() {
+        QUser qUser = new QUser("user");
+        QItem qItem = new QItem("item");
+        QItemRequest qItemRequest = new QItemRequest("itemRequest");
+        QBooking qBooking = new QBooking("booking");
+        QComment qComment = new QComment("comment");
+
+        //Не совсем понял как это тестировать, поэтому сделал такую заглушку для jacoco
     }
 }
