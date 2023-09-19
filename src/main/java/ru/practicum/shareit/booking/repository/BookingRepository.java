@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,42 +15,42 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "select * from bookings where booker_id = ?1 and " +
             "end_date < current_timestamp order by start_date desc", nativeQuery = true)
-    List<Booking> findByBookerIdAndEndIsBefore(Long bookerId);
+    Page<Booking> findByBookerIdAndEndIsBefore(Long bookerId, Pageable pageable);
 
     @Query(value = "select * from bookings where booker_id  = ?1 " +
             "and status = ?2 order by start_date desc", nativeQuery = true)
-    List<Booking> findByBookerIdAndStatus(Long bookerId, String status);
+    Page<Booking> findByBookerIdAndStatus(Long bookerId, String status, Pageable pageable);
 
 
-    List<Booking> findByBooker_IdOrderByStartDesc(Long bookerId);
+    Page<Booking> findByBooker_IdOrderByStartDesc(Long bookerId, Pageable pageable);
 
     @Query(value = "select * from bookings where booker_id = ?1 and start_date > current_timestamp " +
             "order by start_date desc", nativeQuery = true)
-    List<Booking> findByBookerIdAndStartIsAfter(Long bookerId);
+    Page<Booking> findByBookerIdAndStartIsAfter(Long bookerId, Pageable pageable);
 
     @Query(value = "select * from bookings where booker_id = ?1 and start_date <= current_timestamp " +
             "and end_date >= current_timestamp order by start_date desc", nativeQuery = true)
-    List<Booking> findByBookerIdCurrent(Long bookerId);
+    Page<Booking> findByBookerIdCurrent(Long bookerId, Pageable pageable);
 
     @Query(value = "select b from Booking b where b.item.owner.id  = :ownerId " +
             "and b.status = :status order by b.start desc")
-    List<Booking> findByOwnerIdStatus(Long ownerId, Status status);
+    Page<Booking> findByOwnerIdStatus(Long ownerId, Status status, Pageable pageable);
 
     @Query(value = "select b from Booking b where b.item.owner.id = :ownerId " +
             "and b.end < current_timestamp order by b.start desc")
-    List<Booking> findByOwnerIdPast(Long ownerId);
+    Page<Booking> findByOwnerIdPast(Long ownerId, Pageable pageable);
 
     @Query(value = "select b from Booking b where b.item.owner.id = :ownerId " +
             "order by b.start desc")
-    List<Booking> findByOwnerId(Long ownerId);
+    Page<Booking> findByOwnerId(Long ownerId, Pageable pageable);
 
     @Query(value = "select b from Booking b where b.item.owner.id = :ownerId " +
             "and b.start > current_timestamp order by b.start desc")
-    List<Booking> findByOwnerIdFuture(Long ownerId);
+    Page<Booking> findByOwnerIdFuture(Long ownerId,Pageable pageable);
 
     @Query(value = "select b from Booking b where b.item.owner.id = :ownerId and b.start <= current_timestamp " +
             "and b.end >= current_timestamp order by b.start desc")
-    List<Booking> findByOwnerIdCurrent(Long ownerId);
+    Page<Booking> findByOwnerIdCurrent(Long ownerId, Pageable pageable);
 
     @Query(value = "select * from bookings where item_id = ?1 and start_date < current_timestamp " +
             "and status = 'APPROVED' order by end_date desc", nativeQuery = true)

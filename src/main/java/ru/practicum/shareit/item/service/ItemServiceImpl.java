@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -18,6 +19,7 @@ import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -33,6 +35,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -41,6 +44,12 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с данным id не найден: " + userId));
         Item item = mapper.map(itemRequestDto, Item.class);
         item.setOwner(user);
+        if (itemRequestDto.getRequestId() != null) {
+            item.setRequest(itemRequestRepository.findById(itemRequestDto.getRequestId()).orElseThrow());
+        } else {
+            item.setRequest(null);
+        }
+        item.setId(null);
         Item addedItem = itemRepository.save(item);
         return mapper.map(addedItem, ItemResponseDto.class);
     }
@@ -64,6 +73,11 @@ public class ItemServiceImpl implements ItemService {
         item = mapper.map(itemUpdateDto, Item.class);
         item.setId(itemId);
         item.setOwner(user);
+        if (itemUpdateDto.getRequestId() != null) {
+            item.setRequest(itemRequestRepository.findById(itemUpdateDto.getRequestId()).orElseThrow());
+        } else {
+            item.setRequest(null);
+        }
         Item updatedItem = itemRepository.save(item);
         return mapper.map(updatedItem, ItemResponseDto.class);
     }
@@ -83,9 +97,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> getOwnerItems(Long userId) {
+    public List<ItemResponseDto> getOwnerItems(Long userId, Integer from, Integer size) {
         List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
-        for (Item item : itemRepository.findByOwnerId(userId)) {
+        for (Item item : itemRepository.findByOwnerId(userId, PageRequest.of(from, size))) {
             ItemResponseDto itemResponseDto = mapper.map(item, ItemResponseDto.class);
             setBooking(itemResponseDto);
             setComments(itemResponseDto);
@@ -95,10 +109,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> getSearchedItems(String text) {
+    public List<ItemResponseDto> getSearchedItems(String text, Integer from, Integer size) {
         List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
         if (!text.isBlank()) {
-            for (Item item : itemRepository.search(text)) {
+            for (Item item : itemRepository.search(text, PageRequest.of(from, size))) {
                 ItemResponseDto itemResponseDto = mapper.map(item, ItemResponseDto.class);
                 setBooking(itemResponseDto);
                 itemResponseDtos.add(itemResponseDto);

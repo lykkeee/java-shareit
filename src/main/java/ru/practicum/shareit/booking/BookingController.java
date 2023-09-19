@@ -43,17 +43,23 @@ public class BookingController {
     }
 
     @GetMapping()
-    public List<BookingResponseDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "ALL") String state) {
+    public List<BookingResponseDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                    @RequestParam(defaultValue = "ALL") String state,
+                                                    @RequestParam(defaultValue = "0") Integer from,
+                                                    @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрос на получение списка бронирований для пользователя с id: {}", userId);
-        List<BookingResponseDto> bookings = bookingService.getUserBookings(userId, state);
+        List<BookingResponseDto> bookings = bookingService.getUserBookings(userId, state, from, size);
         log.info("Список бронирований получен");
         return bookings;
     }
 
     @GetMapping("/owner")
-    public List<BookingResponseDto> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam(defaultValue = "ALL") String state) {
+    public List<BookingResponseDto> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                     @RequestParam(defaultValue = "ALL") String state,
+                                                     @RequestParam(defaultValue = "0") Integer from,
+                                                     @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрос на получение списка бронирований для владельца с id: {}", userId);
-        List<BookingResponseDto> bookings = bookingService.getOwnerBookings(userId, state);
+        List<BookingResponseDto> bookings = bookingService.getOwnerBookings(userId, state, from, size);
         log.info("Список бронирований получен");
         return bookings;
     }

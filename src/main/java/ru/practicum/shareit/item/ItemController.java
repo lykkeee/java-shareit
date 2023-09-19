@@ -45,17 +45,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponseDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<ItemResponseDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                               @RequestParam(defaultValue = "0") Integer from,
+                                               @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрос на получение всех вещей владельца с id: {}", userId);
-        List<ItemResponseDto> items = itemService.getOwnerItems(userId);
+        List<ItemResponseDto> items = itemService.getOwnerItems(userId, from, size);
         log.info("Список вещей получен");
         return items;
     }
 
     @GetMapping("/search")
-    public List<ItemResponseDto> getSearchedItems(@RequestParam String text) {
+    public List<ItemResponseDto> getSearchedItems(@RequestParam String text,
+                                                  @RequestParam(defaultValue = "0") Integer from,
+                                                  @RequestParam(defaultValue = "10") Integer size) {
         log.info("Запрос на получение вещей по результатам поиска: {}", text);
-        List<ItemResponseDto> items = itemService.getSearchedItems(text);
+        List<ItemResponseDto> items = itemService.getSearchedItems(text, from, size);
         log.info("Список вещей получен");
         return items;
     }
