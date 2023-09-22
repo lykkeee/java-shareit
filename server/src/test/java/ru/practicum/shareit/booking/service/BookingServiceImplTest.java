@@ -15,7 +15,6 @@ import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.exception.IllegalStateException;
 import ru.practicum.shareit.exception.IncorrectTimeException;
 import ru.practicum.shareit.exception.OwnersBookingException;
@@ -225,7 +224,7 @@ class BookingServiceImplTest {
     @Test
     void getOwnerBookingsAll() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(owner));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
         when(bookingRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingResponseDto> response = bookingService.getOwnerBookings(owner.getId(), State.ALL.toString(), 0, 10);
@@ -235,7 +234,7 @@ class BookingServiceImplTest {
     @Test
     void getOwnerBookingsCurrent() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(owner));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
         when(bookingRepository.findByOwnerIdCurrent(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingResponseDto> response = bookingService.getOwnerBookings(owner.getId(), State.CURRENT.toString(), 0, 10);
@@ -245,7 +244,7 @@ class BookingServiceImplTest {
     @Test
     void getOwnerBookingsPast() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(owner));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
         when(bookingRepository.findByOwnerIdPast(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingResponseDto> response = bookingService.getOwnerBookings(owner.getId(), State.PAST.toString(), 0, 10);
@@ -255,7 +254,7 @@ class BookingServiceImplTest {
     @Test
     void getOwnerBookingsFuture() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(owner));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
         when(bookingRepository.findByOwnerIdFuture(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingResponseDto> response = bookingService.getOwnerBookings(owner.getId(), State.FUTURE.toString(), 0, 10);
@@ -265,7 +264,7 @@ class BookingServiceImplTest {
     @Test
     void getOwnerBookingsWaiting() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(owner));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
         when(bookingRepository.findByOwnerIdStatus(Mockito.anyLong(), any(Status.class), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingResponseDto> response = bookingService.getOwnerBookings(owner.getId(), State.WAITING.toString(), 0, 10);
@@ -275,7 +274,7 @@ class BookingServiceImplTest {
     @Test
     void getOwnerBookingsRejected() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(owner));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(item)));
         when(bookingRepository.findByOwnerIdStatus(Mockito.anyLong(), any(Status.class), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.singletonList(booking)));
 
         List<BookingResponseDto> response = bookingService.getOwnerBookings(owner.getId(), State.REJECTED.toString(), 0, 10);
@@ -289,7 +288,7 @@ class BookingServiceImplTest {
         });
 
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user));
-        when(itemRepository.findByOwnerId(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
+        when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         assertThrows(OwnersBookingException.class, () -> {
             List<BookingResponseDto> response = bookingService.getOwnerBookings(user.getId(), "ALL", 0, 10);

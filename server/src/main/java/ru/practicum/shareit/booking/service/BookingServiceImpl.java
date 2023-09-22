@@ -121,7 +121,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Unknown state: UNSUPPORTED_STATUS");
         }
         getUser(userId);
-        if (itemRepository.findByOwnerId(userId, PageRequest.of(0, 1)).isEmpty()) {
+        if (itemRepository.findByOwnerIdOrderById(userId, PageRequest.of(0, 1)).isEmpty()) {
             throw new OwnersBookingException("Пользователь не является владельцем ни одной вещи");
         }
         List<Booking> response = new ArrayList<>();

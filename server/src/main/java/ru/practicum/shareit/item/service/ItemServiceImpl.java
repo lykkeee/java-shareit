@@ -99,7 +99,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemResponseDto> getOwnerItems(Long userId, Integer from, Integer size) {
         List<ItemResponseDto> itemResponseDtos = new ArrayList<>();
-        for (Item item : itemRepository.findByOwnerId(userId, PageRequest.of(from, size))) {
+        for (Item item : itemRepository.findByOwnerIdOrderById(userId, PageRequest.of(from, size))) {
             ItemResponseDto itemResponseDto = mapper.map(item, ItemResponseDto.class);
             setBooking(itemResponseDto);
             setComments(itemResponseDto);

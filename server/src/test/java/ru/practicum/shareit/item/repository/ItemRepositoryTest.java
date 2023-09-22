@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
@@ -72,7 +71,7 @@ class ItemRepositoryTest {
 
     @Test
     void findByOwnerId() {
-        List<Item> request = itemRepository.findByOwnerId(ownerId, PageRequest.of(0, 10)).toList();
+        List<Item> request = itemRepository.findByOwnerIdOrderById(ownerId, PageRequest.of(0, 10)).toList();
 
         assertFalse(request.isEmpty());
         assertEquals("owner", request.get(0).getOwner().getName());
