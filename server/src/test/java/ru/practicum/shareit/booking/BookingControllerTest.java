@@ -116,7 +116,10 @@ class BookingControllerTest {
         Long id = 0L;
 
         mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", id))
+                        .header("X-Sharer-User-Id", id)
+                        .param("state", "ALL")
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -129,7 +132,10 @@ class BookingControllerTest {
         Long id = 0L;
 
         mockMvc.perform(get("/bookings/owner")
-                        .header("X-Sharer-User-Id", id))
+                        .header("X-Sharer-User-Id", id)
+                        .param("state", "ALL")
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk());
 

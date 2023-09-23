@@ -78,7 +78,9 @@ class ItemRequestControllerTest {
         Long id = 0L;
 
         mockMvc.perform(get("/requests/all")
-                        .header("X-Sharer-User-Id", id))
+                        .header("X-Sharer-User-Id", id)
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk());
 

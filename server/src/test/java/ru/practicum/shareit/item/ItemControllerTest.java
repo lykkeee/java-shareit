@@ -115,7 +115,9 @@ class ItemControllerTest {
     @SneakyThrows
     void getOwnerItems() {
         mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", 0L))
+                        .header("X-Sharer-User-Id", 0L)
+                        .param("from", "0")
+                        .param("size", "10"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
