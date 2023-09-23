@@ -8,7 +8,6 @@ import ru.practicum.shareit.request.dto.ItemRequestRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,7 +19,7 @@ public class ItemRequestController {
     public final ItemRequestServiceImpl itemRequestService;
 
     @PostMapping
-    public ItemRequestResponseDto addRequest(@RequestBody @Valid ItemRequestRequestDto requestDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemRequestResponseDto addRequest(@RequestBody ItemRequestRequestDto requestDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
         ItemRequestResponseDto addedRequest = itemRequestService.addRequest(requestDto, userId);
         log.info("Запрос добавлен: {}", addedRequest);
         return addedRequest;
@@ -35,8 +34,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestItemDto> getAllRequests(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                   @RequestParam(defaultValue = "0") Integer from,
-                                                   @RequestParam(defaultValue = "10") Integer size) {
+                                                   @RequestParam Integer from,
+                                                   @RequestParam Integer size) {
         List<ItemRequestItemDto> requests = itemRequestService.getAllRequests(userId, from, size);
         log.info("Список получен");
         return requests;

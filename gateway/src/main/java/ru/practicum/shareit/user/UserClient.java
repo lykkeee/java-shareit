@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -13,7 +12,6 @@ import ru.practicum.shareit.user.dto.UserRequestDto;
 import ru.practicum.shareit.user.dto.UserUpdateDto;
 
 @Service
-@Slf4j
 public class UserClient extends BaseClient {
     private static final String API_PREFIX = "/users";
 
@@ -28,27 +26,22 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> createUser(UserRequestDto userRequestDto) {
-        log.info("Запрос на создание пользователя: {}", userRequestDto);
         return post("", userRequestDto);
     }
 
     public ResponseEntity<Object> updateUser(Long id, UserUpdateDto userUpdateDto) {
-        log.info("Запрос на обновление пользователя с id: {}", id);
         return patch("/" + id, userUpdateDto);
     }
 
     public ResponseEntity<Object> getUser(Long id) {
-        log.info("Запрос на получение пользователя с id: {}", id);
         return get("/" + id);
     }
 
     public ResponseEntity<Object> getUsers() {
-        log.info("Запрос на получение всех пользователей");
         return get("");
     }
 
     public ResponseEntity<Object> deleteUser(Long id) {
-        log.info("Запрос на удаление пользователя с id: {}", id);
         return delete("/" + id);
     }
 }

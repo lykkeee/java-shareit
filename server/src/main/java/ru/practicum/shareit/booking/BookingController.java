@@ -7,7 +7,6 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -19,7 +18,7 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingResponseDto addBooking(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid BookingRequestDto bookingRequestDto) {
+    public BookingResponseDto addBooking(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody BookingRequestDto bookingRequestDto) {
         BookingResponseDto booking = bookingService.addBooking(userId, bookingRequestDto);
         log.info("Запрос на бронирование выполнен");
         return booking;
@@ -41,9 +40,9 @@ public class BookingController {
 
     @GetMapping()
     public List<BookingResponseDto> getUserBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                    @RequestParam(defaultValue = "ALL") String state,
-                                                    @RequestParam(defaultValue = "0") Integer from,
-                                                    @RequestParam(defaultValue = "10") Integer size) {
+                                                    @RequestParam String state,
+                                                    @RequestParam Integer from,
+                                                    @RequestParam Integer size) {
         List<BookingResponseDto> bookings = bookingService.getUserBookings(userId, state, from, size);
         log.info("Список бронирований получен");
         return bookings;
@@ -51,9 +50,9 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<BookingResponseDto> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                     @RequestParam(defaultValue = "ALL") String state,
-                                                     @RequestParam(defaultValue = "0") Integer from,
-                                                     @RequestParam(defaultValue = "10") Integer size) {
+                                                     @RequestParam String state,
+                                                     @RequestParam Integer from,
+                                                     @RequestParam Integer size) {
         List<BookingResponseDto> bookings = bookingService.getOwnerBookings(userId, state, from, size);
         log.info("Список бронирований получен");
         return bookings;

@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
         }
         getUser(userId);
         List<Booking> response = new ArrayList<>();
-        if (from > size) {  //сделал это, чтобы пройти тест в postman. Есть ли какой-нибудь другой вариант? Потому что это явно костыль
+        if (from > size) {
             from = size;
         }
         PageRequest pageRequest = PageRequest.of(from, size);

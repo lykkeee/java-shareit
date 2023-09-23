@@ -10,7 +10,6 @@ import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -21,7 +20,7 @@ public class ItemController {
     public final ItemServiceImpl itemService;
 
     @PostMapping
-    public ItemResponseDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody @Valid ItemRequestDto item) {
+    public ItemResponseDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemRequestDto item) {
         ItemResponseDto addedItem = itemService.addItem(userId, item);
         log.info("Вещь добавлена: {}", addedItem);
         return addedItem;
@@ -43,8 +42,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemResponseDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                               @RequestParam(defaultValue = "0") Integer from,
-                                               @RequestParam(defaultValue = "10") Integer size) {
+                                               @RequestParam Integer from,
+                                               @RequestParam Integer size) {
         List<ItemResponseDto> items = itemService.getOwnerItems(userId, from, size);
         log.info("Список вещей получен");
         return items;
@@ -52,15 +51,15 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemResponseDto> getSearchedItems(@RequestParam String text,
-                                                  @RequestParam(defaultValue = "0") Integer from,
-                                                  @RequestParam(defaultValue = "10") Integer size) {
+                                                  @RequestParam Integer from,
+                                                  @RequestParam Integer size) {
         List<ItemResponseDto> items = itemService.getSearchedItems(text, from, size);
         log.info("Список вещей получен");
         return items;
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentResponseDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable("itemId") Long itemId, @RequestBody @Valid CommentRequestDto comment) {
+    public CommentResponseDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable("itemId") Long itemId, @RequestBody CommentRequestDto comment) {
         CommentResponseDto addedComment = itemService.addComment(userId, itemId, comment);
         log.info("Комментарий добавлен");
         return addedComment;

@@ -23,6 +23,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Object> addBooking(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                              @RequestBody @Valid BookingRequestDto bookingRequestDto) {
+        log.info("Запрос на создание нового бронирования от пользователя с id: {}", userId);
         return bookingClient.addBooking(userId, bookingRequestDto);
     }
 
@@ -30,12 +31,14 @@ public class BookingController {
     public ResponseEntity<Object> approveBooking(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                                  @PathVariable("bookingId") @Positive Long bookingId,
                                                  @RequestParam Boolean approved) {
+        log.info("Запрос на подтверждение бронирования с id: {}", bookingId);
         return bookingClient.approveBooking(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<Object> getBooking(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                              @PathVariable("bookingId") @Positive Long bookingId) {
+        log.info("Запрос на получение информации о бронирование с id: {}", bookingId);
         return bookingClient.getBooking(userId, bookingId);
     }
 
@@ -44,6 +47,7 @@ public class BookingController {
                                                   @RequestParam(name = "state", defaultValue = "ALL") String state,
                                                   @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                   @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос на получение списка бронирований для пользователя с id: {}", userId);
         return bookingClient.getUserBookings(userId, state, from, size);
     }
 
@@ -52,6 +56,7 @@ public class BookingController {
                                                   @RequestParam(name = "state", defaultValue = "ALL") String state,
                                                   @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                   @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос на получение списка бронирований для владельца с id: {}", userId);
         return bookingClient.getOwnerBookings(userId, state, from, size);
     }
 }

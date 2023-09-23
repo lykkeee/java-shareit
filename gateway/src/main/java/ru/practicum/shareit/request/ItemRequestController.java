@@ -23,11 +23,13 @@ public class ItemRequestController {
     @PostMapping
     public ResponseEntity<Object> addRequest(@RequestBody @Valid ItemRequestRequestDto requestDto,
                                              @RequestHeader("X-Sharer-User-Id") @Positive Long userId) {
+        log.info("Запрос на добавление нового запроса на вещь от пользователя с id: {}", userId);
         return itemRequestClient.addRequest(requestDto, userId);
     }
 
     @GetMapping
     public ResponseEntity<Object> getRequests(@RequestHeader("X-Sharer-User-Id") @Positive Long userId) {
+        log.info("Запрос на получение списка запросов пользователя с id: {}", userId);
         return itemRequestClient.getRequests(userId);
     }
 
@@ -35,12 +37,14 @@ public class ItemRequestController {
     public ResponseEntity<Object> getAllRequests(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                                  @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                  @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос на получение списка запросов");
         return itemRequestClient.getAllRequests(userId, from, size);
     }
 
     @GetMapping("{requestId}")
     public ResponseEntity<Object> getRequest(@PathVariable("requestId") @Positive Long requestId,
                                              @RequestHeader("X-Sharer-User-Id") @Positive Long userId) {
+        log.info("Запрос на получение запроса с id: {}", requestId);
         return itemRequestClient.getRequest(requestId, userId);
     }
 }

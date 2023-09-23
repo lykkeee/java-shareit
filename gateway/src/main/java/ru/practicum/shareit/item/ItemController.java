@@ -25,6 +25,7 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<Object> addItem(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                           @RequestBody @Valid ItemRequestDto itemRequestDto) {
+        log.info("Запрос на добавление новой вещи: {}", itemRequestDto);
         return itemClient.addItem(userId, itemRequestDto);
     }
 
@@ -32,12 +33,14 @@ public class ItemController {
     public ResponseEntity<Object> updateItem(@PathVariable("itemId") @Positive Long itemId,
                                              @RequestBody ItemUpdateDto itemUpdateDto,
                                              @RequestHeader("X-Sharer-User-Id") @Positive Long userId) {
+        log.info("Запрос на обновление вещи: {}", itemUpdateDto);
         return itemClient.updateItem(itemId,itemUpdateDto, userId);
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getItem(@PathVariable("itemId") @Positive Long itemId,
                                           @RequestHeader("X-Sharer-User-Id") @Positive Long userId) {
+        log.info("Запрос на получение вещи с id: {}", itemId);
         return itemClient.getItem(itemId, userId);
     }
 
@@ -45,6 +48,7 @@ public class ItemController {
     public ResponseEntity<Object> getOwnerItems(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                                @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                                @RequestParam(defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос на получение всех вещей владельца с id: {}", userId);
         return itemClient.getOwnerItems(userId, from, size);
     }
 
@@ -52,6 +56,7 @@ public class ItemController {
     public ResponseEntity<Object> getSearchedItems(@RequestParam String text,
                                                 @RequestParam(name = "from", defaultValue = "0") @PositiveOrZero Integer from,
                                                 @RequestParam(name = "size", defaultValue = "10") @Positive Integer size) {
+        log.info("Запрос на получение вещей по результатам поиска: {}", text);
         return itemClient.getSearchedItems(text, from, size);
     }
 
@@ -59,6 +64,7 @@ public class ItemController {
     public ResponseEntity<Object> addComment(@RequestHeader("X-Sharer-User-Id") @Positive Long userId,
                                          @PathVariable("itemId") @Positive Long itemId,
                                          @RequestBody @Valid CommentRequestDto comment) {
+        log.info("Запрос на добавление комментария к вещи с id: {} от пользователя с id: {}", itemId, userId);
         return itemClient.addComment(userId, itemId, comment);
     }
 }
