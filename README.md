@@ -8,5 +8,5 @@ Java 11, Spring Boot, Spring Data, Lombok, Spring Jpa, PostgreSQL, Hibernate ORM
 
 ## Схема базы данных:
 
-![db](db picture%2Fmain db.png)
+![db](db_picture%2Fmain_db.png)
 
