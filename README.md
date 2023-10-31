@@ -5,3 +5,8 @@
 <summary><h2> Стек: </h2></summary>
 Java 11, Spring Boot, Spring Data, Lombok, Spring Jpa, PostgreSQL, Hibernate ORM, Docker.
 Реализован docker-compose.yml со всеми необходимыми параметрами.
+
+## Схема базы данных:
+
+![db](db picture%2Fmain db.png)
+
